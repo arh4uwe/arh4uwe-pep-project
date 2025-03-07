@@ -1,5 +1,11 @@
 package Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import Model.Account;
+import Service.AccountService;
+import Service.AccountServiceImpl;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -9,6 +15,9 @@ import io.javalin.http.Context;
  * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
  */
 public class SocialMediaController {
+    private static ObjectMapper om = new ObjectMapper();
+    private static AccountService accountService = new AccountServiceImpl();
+
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
@@ -17,6 +26,7 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
+        app.post("/register", this::registrationHandler);
 
         return app;
     }
@@ -29,5 +39,28 @@ public class SocialMediaController {
         context.json("sample text");
     }
 
+    private void registrationHandler(Context context) {
+        String json = context.body();
+
+        try {
+            Account accountToCreate = om.readValue(json, Account.class);
+            Account createdAccount = accountService.registerUser(accountToCreate);
+
+            /*
+             * If createdAccount is null, registration failed.
+             * Update status to 400 (Client Error).
+             */
+            if (createdAccount == null)
+                context.status(400);
+            /*
+             * Otherwise, registration succeeded.
+             * The response body will contain the created account in JSON format.
+             */
+            else
+                context.json(createdAccount);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
