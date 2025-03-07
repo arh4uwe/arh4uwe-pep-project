@@ -18,9 +18,11 @@ public interface AccountService {
 
     /**
      * Logs in using the username and password of the given Account. Login is successful 
-     * if the username and 
-     * @param account
-     * @return
+     * if the username and password match one of the accounts in the database. In this case, 
+     * that Account will be returned. Otherwise, null will be returned.
+     * 
+     * @param account an Account object containing a username and password to validate
+     * @return the Account with the given Account's username and password, if such an Account exists
      */
     Account login(Account account);
 }
