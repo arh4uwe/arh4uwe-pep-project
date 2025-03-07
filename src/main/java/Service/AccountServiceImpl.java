@@ -27,8 +27,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account login(Account account) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
+        /*
+         * Return the account in the database with the given Account object's username and password, 
+         * or null if no such account exists.
+         */
+        return dao.getAccountByUsernameAndPassword(account.getUsername(), account.getPassword());
     }
     
 }
