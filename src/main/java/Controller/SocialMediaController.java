@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
 import Service.AccountServiceImpl;
+import Service.MessageService;
+import Service.MessageServiceImpl;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -17,6 +20,7 @@ import io.javalin.http.Context;
 public class SocialMediaController {
     private static ObjectMapper om = new ObjectMapper();
     private static AccountService accountService = new AccountServiceImpl();
+    private static MessageService messageService = new MessageServiceImpl();
 
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
@@ -28,6 +32,7 @@ public class SocialMediaController {
         app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::registrationHandler);
         app.post("/login", this::loginHandler);
+        app.post("/messages", this::createMessageHandler);
 
         return app;
     }
@@ -61,6 +66,7 @@ public class SocialMediaController {
                 context.json(createdAccount);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            context.status(500);
         }
     }
 
@@ -85,6 +91,32 @@ public class SocialMediaController {
                 context.json(authenticatedAccount);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            context.status(500);
+        }
+    }
+
+    private void createMessageHandler(Context context) {
+        String json = context.body();
+
+        try {
+            Message messageToCreate = om.readValue(json, Message.class);
+            Message createdMessage = messageService.createMessage(messageToCreate);
+
+            /*
+             * If createdMessage is null, message creation failed.
+             * Update status to 400 (Client Error).
+             */
+            if (createdMessage == null)
+                context.status(400);
+            /*
+             * Otherwise, message creation succeeded.
+             * The response body will contain the newly created message in JSON format.
+             */
+            else
+                context.json(createdMessage);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            context.status(500);
         }
     }
 
