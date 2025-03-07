@@ -174,7 +174,7 @@ public class MessageDAOImpl implements MessageDAO {
             // Execute the query
             int checkDelete = ps.executeUpdate();
 
-            // checkUpdate will be 0 if delete failed
+            // checkDelete will be 0 if delete failed
             if (checkDelete != 0) {
                 return oldMessage;
             } else {
@@ -200,7 +200,21 @@ public class MessageDAOImpl implements MessageDAO {
             PreparedStatement ps = conn.prepareStatement(query);
 
             // Set query parameters
-            
+            ps.setString(1, message_text);
+            ps.setInt(2, message_id);
+
+            // Run the query
+            int checkUpdate = ps.executeUpdate();
+
+            // checkUpdate will be 0 if update failed
+            if (checkUpdate != 0) {
+                /*
+                 * Return the newly updated Message.
+                 * We do not have direct access to this Message, 
+                 * so we have to make another SQL query.
+                 */
+                ret = getMessageById(message_id);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -210,8 +224,38 @@ public class MessageDAOImpl implements MessageDAO {
 
     @Override
     public List<Message> getMessagesByAccountId(int posted_by) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMessagesByAccountId'");
+        // the List to return
+        List<Message> ret = new ArrayList<>();
+
+        try {
+            // Connect to the database
+            Connection conn = ConnectionUtil.getConnection();
+
+            // Create the query
+            String query = "SELECT * FROM message WHERE posted_by = ?";
+            PreparedStatement ps = conn.prepareStatement(query);
+
+            // Set query parameter
+            ps.setInt(1, posted_by);
+
+            // Execute the query
+            ResultSet rs = ps.executeQuery();
+
+            // Use a while loop with ResultSet.next() because there may be multiple rows
+            while (rs.next()) {
+                // Create a new Message object with the data from the current row
+                ret.add(new Message(
+                    rs.getInt("message_id"),
+                    rs.getInt("posted_by"),
+                    rs.getString("message_text"),
+                    rs.getLong("time_posted_epoch")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
     }
     
 }
