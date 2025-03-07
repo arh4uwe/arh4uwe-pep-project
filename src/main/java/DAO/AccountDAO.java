@@ -30,6 +30,15 @@ public interface AccountDAO {
      * or null if there is no such Account.
      * 
      * @param username the username to search for
+     * @return the Account in the account table with the given username and password
+     */
+    Account getAccountByUsername(String username);
+
+    /**
+     * Returns the Account in the account table with the given username and password,
+     * or null if there is no such Account.
+     * 
+     * @param username the username to search for
      * @param password the password to search for
      * @return the Account in the account table with the given username and password
      */

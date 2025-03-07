@@ -86,6 +86,44 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     @Override
+    public Account getAccountByUsername(String username) {
+        // the Account to return
+        Account ret = null;
+
+        try {
+            // Connect to the database
+            Connection conn = ConnectionUtil.getConnection();
+
+            // Create the query
+            String query = "SELECT * FROM account WHERE username = ?";
+            PreparedStatement ps = conn.prepareStatement(query);
+
+            // Set query parameter
+            ps.setString(1, username);
+
+            // Run the query
+            ResultSet rs = ps.executeQuery();
+
+            /*
+             * Use ResultSet.next() to check if there is data.
+             * If possible, advance the cursor to the first row.
+             */
+            if (rs.next()) {
+                // Create a new Account object with the data from the ResultSet.
+                ret = new Account(
+                    rs.getInt("account_id"),
+                    rs.getString("username"),
+                    rs.getString("password")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    @Override
     public Account getAccountByUsernameAndPassword(String username, String password) {
         // the Account to return
         Account ret = null;
