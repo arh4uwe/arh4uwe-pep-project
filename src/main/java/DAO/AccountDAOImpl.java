@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import Model.Account;
 import Util.ConnectionUtil;
@@ -12,13 +13,16 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public Account addAccount(Account account) {
+        // The Account object to be returned
+        Account ret = null;
+
         try {
             // Connect to the database
             Connection conn = ConnectionUtil.getConnection();
 
             // Create the query
             String query = "INSERT INTO account (username, password) VALUES (?, ?)";
-            PreparedStatement ps = conn.prepareStatement(query);
+            PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             // Set query parameters
             ps.setString(1, account.getUsername());
@@ -34,17 +38,28 @@ public class AccountDAOImpl implements AccountDAO {
             if (checkInsert != 0) {
                 /*
                  * Return the newly created Account.
-                 * We do not have direct access to this Account, 
-                 * so we have to make another SQL query.
+                 * We have access to this account via the generated keys.
                  */
-                return getAccountByUsernameAndPassword(account.getUsername(), account.getPassword());
-            } else {
-                return null;
+                ResultSet rs = ps.getGeneratedKeys();
+
+                /*
+                * Use ResultSet.next() to check if there is data.
+                * If possible, advance the cursor to the first row.
+                */
+                if (rs.next()) {
+                    // Create a new Account object with the data from the ResultSet.
+                    ret = new Account(
+                        rs.getInt("account_id"),
+                        rs.getString("username"),
+                        rs.getString("password")
+                    );
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+
+        return ret;
     }
 
     @Override
