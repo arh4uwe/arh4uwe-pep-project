@@ -27,6 +27,7 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::registrationHandler);
+        app.post("/login", this::loginHandler);
 
         return app;
     }
@@ -58,6 +59,30 @@ public class SocialMediaController {
              */
             else
                 context.json(createdAccount);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loginHandler(Context context) {
+        String json = context.body();
+
+        try {
+            Account accountToAuthenticate = om.readValue(json, Account.class);
+            Account authenticatedAccount = accountService.login(accountToAuthenticate);
+
+            /*
+             * If authenticatedAccount is null, login failed.
+             * Update status to 401 (Unauthorized).
+             */
+            if (authenticatedAccount == null)
+                context.status(401);
+            /*
+             * Otherwise, registration succeeded.
+             * The response body will contain the authenticated account in JSON format.
+             */
+            else
+                context.json(authenticatedAccount);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
