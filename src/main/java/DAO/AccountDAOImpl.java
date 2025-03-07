@@ -93,12 +93,12 @@ public class AccountDAOImpl implements AccountDAO {
         try {
             // Connect to the database
             Connection conn = ConnectionUtil.getConnection();
-            
+
             // Create the query
             String query = "SELECT * FROM account WHERE username = ? AND password = ?";
             PreparedStatement ps = conn.prepareStatement(query);
 
-            // Set query parameter
+            // Set query parameters
             ps.setString(1, username);
             ps.setString(2, password);
 
