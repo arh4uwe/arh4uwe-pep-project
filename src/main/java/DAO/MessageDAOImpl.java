@@ -26,7 +26,7 @@ public class MessageDAOImpl implements MessageDAO {
             // Create the query
             String query = "INSERT INTO message (posted_by, message_text, time_posted_epoch) ";
             query += "VALUES (?, ?, ?)";
-            PreparedStatement ps = conn.prepareStatement(query);
+            PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             // Set query parameters
             ps.setInt(1, message.getPosted_by());
@@ -43,20 +43,9 @@ public class MessageDAOImpl implements MessageDAO {
             if (checkInsert != 0) {
                 /*
                  * Return the newly created Message.
-                 * We do not have direct access to this Message, 
-                 * so we have to make another SQL query.
+                 * We have access to this Message via the generated keys.
                  */
-                String query2 = "SELECT * FROM message WHERE ";
-                query2 += "posted_by = ?, message_text = ?, time_posted_epoch = ?";
-                PreparedStatement ps2 = conn.prepareStatement(query2);
-
-                // Set query parameters
-                ps2.setInt(1, message.getPosted_by());
-                ps2.setString(2, message.getMessage_text());
-                ps2.setLong(3, message.getTime_posted_epoch());
-
-                // Run the query
-                ResultSet rs = ps2.executeQuery();
+                ResultSet rs = ps.getGeneratedKeys();
 
                 /*
                 * Use ResultSet.next() to check if there is data.
