@@ -34,32 +34,36 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getAllMessages() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllMessages'");
+        return messageDAO.getAllMessages();
     }
 
     @Override
     public Message getMessageById(int message_id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMessageById'");
+        return messageDAO.getMessageById(message_id);
     }
 
     @Override
     public Message deleteMessageById(int message_id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteMessageById'");
+        return messageDAO.deleteMessageById(message_id);
     }
 
     @Override
     public Message updateMessageById(int message_id, String message_text) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateMessageById'");
+        // Check that there exists a message with the given ID
+        if (messageDAO.getMessageById(message_id) == null)
+            return null;
+        
+        // Check that the message text is not blank and is under 255 characters
+        if (message_text == null || message_text.equals("")
+                || message_text.length() > MAX_MESSAGE_LENGTH)
+            return null;
+        
+        return messageDAO.updateMessageById(message_id, message_text);
     }
 
     @Override
     public List<Message> getAllMessagesFromUserById(int account_id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllMessagesFromUserById'");
+        return messageDAO.getMessagesByAccountId(account_id);
     }
     
 }
