@@ -35,6 +35,8 @@ public class SocialMediaController {
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
+        app.patch("/messages/{message_id}", this::updateMessageByIdHandler);
 
         return app;
     }
@@ -129,6 +131,31 @@ public class SocialMediaController {
     private void getMessageByIdHandler(Context context) {
         int messageId = Integer.parseInt(context.pathParam("message_id"));
         context.json(messageService.getMessageById(messageId));
+    }
+
+    private void deleteMessageByIdHandler(Context context) {
+        int messageId = Integer.parseInt(context.pathParam("message_id"));
+        context.json(messageService.deleteMessageById(messageId));
+    }
+
+    private void updateMessageByIdHandler(Context context) {
+        int messageId = Integer.parseInt(context.pathParam("message_id"));
+        String messageText = context.body();
+
+        Message updatedMessage = messageService.updateMessageById(messageId, messageText);
+
+        /*
+         * If updatedMessage is null, message update failed.
+         * Update status to 400 (Client Error).
+         */
+        if (updatedMessage == null)
+            context.status(400);
+        /*
+         * Otherwise, message update succeeded.
+         * The response body will contain the newly updated Message object in JSON format.
+         */
+        else
+            context.json(updatedMessage);
     }
 
 }
