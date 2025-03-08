@@ -141,22 +141,30 @@ public class SocialMediaController {
 
     private void updateMessageByIdHandler(Context context) {
         int messageId = Integer.parseInt(context.pathParam("message_id"));
-        String messageText = context.body();
+        String json = context.body();
 
-        Message updatedMessage = messageService.updateMessageById(messageId, messageText);
+        try {
+            Message messageToUpdate = om.readValue(json, Message.class);
+            String messageText = messageToUpdate.getMessage_text();
 
-        /*
-         * If updatedMessage is null, message update failed.
-         * Update status to 400 (Client Error).
-         */
-        if (updatedMessage == null)
-            context.status(400);
-        /*
-         * Otherwise, message update succeeded.
-         * The response body will contain the newly updated Message object in JSON format.
-         */
-        else
-            context.json(updatedMessage);
+            Message updatedMessage = messageService.updateMessageById(messageId, messageText);
+
+            /*
+             * If updatedMessage is null, message update failed.
+             * Update status to 400 (Client Error).
+             */
+            if (updatedMessage == null)
+                context.status(400);
+            /*
+             * Otherwise, message update succeeded.
+             * The response body will contain the newly updated Message object in JSON format.
+             */
+            else
+                context.json(updatedMessage);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            context.status(500);
+        }
     }
 
     private void getMessagesByAccountIdHandler(Context context) {
