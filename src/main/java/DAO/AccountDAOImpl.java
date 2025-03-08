@@ -48,11 +48,8 @@ public class AccountDAOImpl implements AccountDAO {
                 */
                 if (rs.next()) {
                     // Create a new Account object with the data from the ResultSet.
-                    ret = new Account(
-                        rs.getInt("account_id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                    );
+                    int generatedId = rs.getInt("account_id");
+                    ret = new Account(generatedId, account.getUsername(), account.getPassword());
                 }
             }
         } catch (SQLException e) {
