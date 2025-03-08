@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Model.Account;
 import Model.Message;
 import Util.ConnectionUtil;
 
@@ -53,11 +52,12 @@ public class MessageDAOImpl implements MessageDAO {
                 */
                 if (rs.next()) {
                     // Create a new Message object with the data from the ResultSet.
+                    int generatedId = rs.getInt("message_id");
                     ret = new Message(
-                        rs.getInt("message_id"),
-                        rs.getInt("posted_by"),
-                        rs.getString("message_text"),
-                        rs.getLong("time_posted_epoch")
+                        generatedId,
+                        message.getPosted_by(),
+                        message.getMessage_text(),
+                        message.getTime_posted_epoch()
                     );
                 }
             }

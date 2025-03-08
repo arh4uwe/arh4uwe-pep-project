@@ -131,12 +131,24 @@ public class SocialMediaController {
 
     private void getMessageByIdHandler(Context context) {
         int messageId = Integer.parseInt(context.pathParam("message_id"));
-        context.json(messageService.getMessageById(messageId));
+        Message message = messageService.getMessageById(messageId);
+        /*
+         * The message can only be returned as JSON if it isn't null.
+         * Otherwise, do nothing, and the response body will be empty.
+         */
+        if (message != null)
+            context.json(message);
     }
 
     private void deleteMessageByIdHandler(Context context) {
         int messageId = Integer.parseInt(context.pathParam("message_id"));
-        context.json(messageService.deleteMessageById(messageId));
+        Message message = messageService.deleteMessageById(messageId);
+        /*
+         * The message can only be returned as JSON if it isn't null.
+         * Otherwise, do nothing, and the response body will be empty.
+         */
+        if (message != null)
+            context.json(message);
     }
 
     private void updateMessageByIdHandler(Context context) {
